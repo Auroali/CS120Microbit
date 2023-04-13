@@ -1,0 +1,12 @@
+[package]
+name = "microbit"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+panic-halt = "~0.2"
+microbit-v2="~0.13.0"
+cortex-m-rt = "~0.7"
+cortex-m = { version="~0.7.3", features = ["critical-section-single-core"] }
