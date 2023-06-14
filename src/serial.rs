@@ -18,6 +18,8 @@ impl<T: Instance> UartePort<T> {
     }
 
     pub fn write_str(&mut self, s: &str) -> fmt::Result {
+        // Only write to the serial during debugging
+        #[cfg(debug_assertions)]
         self.0.write_str(s)
     }
 }
