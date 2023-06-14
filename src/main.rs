@@ -8,18 +8,16 @@ mod game_state;
 mod serial;
 
 use crate::game_state::GameState;
-use crate::serial::UartePort;
 use core::cell::RefCell;
 use cortex_m::interrupt::Mutex;
 use cortex_m_rt::entry;
 use microbit::hal::rtc::{Instance, RtcInterrupt};
-use microbit::hal::uarte::{Baudrate, Parity};
 use microbit::hal::{Clocks, Rtc};
-use microbit::pac::{interrupt, RTC0, TIMER1, TIMER2, UARTE0};
+use microbit::pac::{interrupt, RTC0, TIMER1, TIMER2};
 use microbit::{
     board::Board,
     display::nonblocking::{Display, GreyscaleImage},
-    hal::{prelude::*, uarte, Timer},
+    hal::{prelude::*, Timer},
     pac,
 };
 
@@ -54,18 +52,18 @@ fn main() -> ! {
         timer2.start(GRAVITY_TIMER);
         timer2.enable_interrupt();
 
-        let serial = {
-            let serial = uarte::Uarte::new(
-                board.UARTE0,
-                board.uart.into(),
-                Parity::EXCLUDED,
-                Baudrate::BAUD115200,
-            );
-            UartePort::new(serial)
-        };
+        // let serial = {
+        //     let serial = uarte::Uarte::new(
+        //         board.UARTE0,
+        //         board.uart.into(),
+        //         Parity::EXCLUDED,
+        //         Baudrate::BAUD115200,
+        //     );
+        //     UartePort::new(serial)
+        // };
 
         // Move these values into the static mutexes, so we can access them from interrupts
-        set_mutex(display, timer2, rtc0, serial);
+        set_mutex(display, timer2, rtc0);
 
         unsafe {
             board.NVIC.set_priority(pac::Interrupt::RTC0, 64);
@@ -154,17 +152,12 @@ fn init_rtc<T: Instance>(rtc: T, prescaler: u32) -> Rtc<T> {
     rtc0
 }
 
-fn set_mutex(
-    display: Display<TIMER1>,
-    timer2: Timer<TIMER2>,
-    rtc0: Rtc<RTC0>,
-    serial: UartePort<UARTE0>,
-) {
+fn set_mutex(display: Display<TIMER1>, timer2: Timer<TIMER2>, rtc0: Rtc<RTC0>) {
     cortex_m::interrupt::free(move |cs| {
         *DISPLAY.borrow(cs).borrow_mut() = Some(display);
         *LOGIC_TIMER.borrow(cs).borrow_mut() = Some(timer2);
         *DISPLAY_TIMER.borrow(cs).borrow_mut() = Some(rtc0);
-        *GAME_STATE.borrow(cs).borrow_mut() = Some(GameState::new(serial));
+        *GAME_STATE.borrow(cs).borrow_mut() = Some(GameState::new());
     });
 }
 

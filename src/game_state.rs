@@ -1,6 +1,4 @@
-use crate::serial::UartePort;
 use microbit::display::nonblocking::GreyscaleImage;
-use microbit::pac::UARTE0;
 
 pub struct Level {
     layout: [[u8; 80]; 5],
@@ -12,17 +10,12 @@ pub struct GameState {
     level: [Level; GameState::LEVEL_COUNT],
     current_level: usize,
     has_won: bool,
-    serial: UartePort<UARTE0>,
 }
 
 impl Level {
     pub const GROUND_PIXEL: u8 = 4u8;
     pub const MARKER_PIXEL: u8 = 1u8;
     pub const FLAG_PIXEL: u8 = 6u8;
-    // Completely blank level
-    const EMPTY: Level = Level {
-        layout: [[0u8; 80]; 5],
-    };
 
     pub const fn new(layout: &[[u8; 80]; 5]) -> Self {
         Self { layout: *layout }
@@ -89,7 +82,7 @@ impl Level {
 impl GameState {
     const LEVEL_COUNT: usize = 4;
 
-    pub fn new(serial: UartePort<UARTE0>) -> Self {
+    pub fn new() -> Self {
         Self {
             player_pos: [0, 1],
             level: [
@@ -101,7 +94,6 @@ impl GameState {
             current_level: 0,
             jump_cancel: 0,
             has_won: false,
-            serial,
         }
     }
 

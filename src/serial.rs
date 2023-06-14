@@ -1,6 +1,5 @@
 use core::fmt;
 use core::fmt::Write;
-use core::ops::Add;
 use microbit::hal::uarte::{Instance, UarteRx, UarteTx};
 use microbit::hal::Uarte;
 
